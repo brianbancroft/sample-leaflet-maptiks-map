@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Basic Choropleth Example with API Call - Leaflet</title>
+    <title>Data Map</title>
 
     <meta charset="utf-8" />
+    <meta name="theme-color" content="#ff0000" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link
@@ -31,10 +32,54 @@
 
   <body>
     <main>
-      <header></header>
-      <div class="side-panel"></div>
+      <header>
+        <h1>Data Map</h1>
+      </header>
+      <div class="side-panel">
+        <h3>Layers</h3>
+        <hr />
+        <div class="layers-panel">
+          <ul class="top-level">
+            <li class="top-level enabled">
+              <input type="checkbox" checked />Statistics
+            </li>
+            <ul class="second-level">
+              <li class="second-level enabled">
+                <input type="checkbox" checked />Income
+              </li>
+              <li class="second-level disabled">
+                <input type="checkbox" />Crime
+              </li>
+              <li class="second-level disabled">
+                <input type="checkbox" />Age Breakdown
+              </li>
+            </ul>
+            <li class="top-level disabled">
+              <input type="checkbox" />Real Estate
+            </li>
+            <li class="top-level disabled"><input type="checkbox" />Weather</li>
+            <li class="top-level enabled">
+              <input type="checkbox" checked />Amenities
+            </li>
+            <ul class="second-level">
+              <li class="second-level enabled">
+                <input type="checkbox" checked />Pubs
+              </li>
+              <li class="second-level disabled">
+                <input type="checkbox" />Recreation Centers
+              </li>
+              <li class="second-level disabled">
+                <input type="checkbox" />Museums
+              </li>
+            </ul>
+          </ul>
+        </div>
+      </div>
       <div id="map"></div>
-      <footer></footer>
+      <footer>
+        Hamscrabbled by Brian Bancroft, 2019.
+        <a href="https://bancroft.io" target="_blank">More about me</a>
+      </footer>
     </main>
     <script src="index.js" type="text/javascript"></script>
   </body>
