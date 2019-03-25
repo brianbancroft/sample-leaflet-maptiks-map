@@ -1,7 +1,6 @@
-const accessToken = '<YOUR TOKEN HERE>'
-const map = L.map("map").setView([48.3062302, -123.3942418], 10);
+var map = L.map("map").setView([48.3062302, -123.3942418], 10);
 L.tileLayer(
-  `https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=${accessToken}`,
+  "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYnJpYW5iYW5jcm9mdCIsImEiOiJsVGVnMXFzIn0.7ldhVh3Ppsgv4lCYs65UdA",
   {
     maxZoom: 18,
     attribution:
@@ -13,22 +12,25 @@ L.tileLayer(
 ).addTo(map);
 
 // control that shows state info on hover
-const info = L.control();
+var info = L.control();
 
-info.onAdd = function (map) {
+info.onAdd = function(map) {
   this._div = L.DomUtil.create("div", "info");
   this.update();
   return this._div;
 };
 
-info.update = function (props) {
+info.update = function(props) {
   this._div.innerHTML =
-    "<h4>Average Household Income</h4>" + (props ? "$" + props.total : "Hover over a census tract");
+    "<h4>Average Household Income</h4>" +
+    (props ? "$" + props.total : "Hover over a census tract");
 };
 
 info.addTo(map);
 
-const getColor = (d) => {
+// get color depending on population total value
+
+function getColor(d) {
   let color;
 
   if (d > 150000) {
@@ -36,25 +38,27 @@ const getColor = (d) => {
   } else if (d > 110000) {
     color = "#92c5de";
   } else if (d > 90000) {
-    color = "#f7e8f9";
+    color = "#FF0000";
   } else if (d > 60000) {
-    color = "#f4a582";
+    color = "#BF0000";
   } else {
-    color = "#ca0020";
+    color = "#400000";
   }
   return color;
 }
 
-const style = feature => ({
-  weight: 2,
-  opacity: 1,
-  color: "white",
-  dashArray: "3",
-  fillOpacity: 0.7,
-  fillColor: getColor(feature.properties.total)
-})
+function choroplethStyle(feature) {
+  return {
+    weight: 2,
+    opacity: 1,
+    color: "white",
+    dashArray: "3",
+    fillOpacity: 0.7,
+    fillColor: getColor(feature.properties.total)
+  };
+}
 
-const highlightFeature = (e) => {
+function highlightFeature(e) {
   var layer = e.target;
 
   layer.setStyle({
@@ -71,18 +75,18 @@ const highlightFeature = (e) => {
   info.update(layer.feature.properties);
 }
 
-let geojson;
+var choropleth;
 
-const resetHighlight = (e) => {
-  geojson.resetStyle(e.target);
+function resetHighlight(e) {
+  choropleth.resetStyle(e.target);
   info.update();
 }
 
-const zoomToFeature = (e) => {
+function zoomToFeature(e) {
   map.fitBounds(e.target.getBounds());
 }
 
-const onEachFeature = (feature, layer) => {
+function onEachFeature(feature, layer) {
   layer.on({
     mouseover: highlightFeature,
     mouseout: resetHighlight,
@@ -90,8 +94,8 @@ const onEachFeature = (feature, layer) => {
   });
 }
 
-geojson = L.geoJson(null, {
-  style: style,
+choropleth = L.geoJson(null, {
+  style: choroplethStyle,
   onEachFeature: onEachFeature
 }).addTo(map);
 
@@ -99,25 +103,25 @@ map.attributionControl.addAttribution(
   'Population data &copy; <a href="https://www.statcan.gc.ca/eng/start">Statistics Canada</a>'
 );
 
-const legend = L.control({ position: "bottomright" });
+var legend = L.control({ position: "bottomright" });
 
-legend.onAdd = function (map) {
-  const div = L.DomUtil.create("div", "info legend"),
+legend.onAdd = function(map) {
+  var div = L.DomUtil.create("div", "info legend"),
     grades = [0, 60000, 90000, 110000, 150000],
     labels = [],
     from,
     to;
 
-  for (const i = 0; i < grades.length; i++) {
+  for (var i = 0; i < grades.length; i++) {
     from = grades[i];
     to = grades[i + 1];
 
     labels.push(
       '<i style="background:' +
-      getColor(from + 1) +
-      '"></i> $' +
-      from +
-      (to ? "&ndash; $" + to : "+")
+        getColor(from + 1) +
+        '"></i> $' +
+        from +
+        (to ? "&ndash; $" + to : "+")
     );
   }
 
@@ -132,6 +136,9 @@ axios
     "https://s3.amazonaws.com/cdn.brianbancroft.io/assets/sample-map-data/income-with-children.geojson"
   )
   .then(response => {
-    geojson.addData(response.data);
+    choropleth.addData(response.data);
   })
   .catch(console.error);
+
+const pubs =
+  "https://gist.githubusercontent.com/brianbancroft/2e6abac2ce26a9ff188ac4c8d17bb3ff/raw/10404a93a040ba2cb0224ef4c86fed8743d3a22f/map.geojson";
