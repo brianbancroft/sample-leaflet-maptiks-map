@@ -2,6 +2,7 @@ var map = L.map("map").setView([48.4062302, -123.3942418], 12);
 L.tileLayer(
   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYnJpYW5iYW5jcm9mdCIsImEiOiJsVGVnMXFzIn0.7ldhVh3Ppsgv4lCYs65UdA",
   {
+    // ENTER THE MAP NAME HERE
     maxZoom: 18,
     attribution:
       'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
@@ -11,9 +12,17 @@ L.tileLayer(
   }
 ).addTo(map);
 
+/*  ============== LAYER DEFINITIONS =======================================
+ *
+ * Layers go here. This is where you add the maptiks layer identifiers
+ *
+ *   =======================================================================
+ */
+
 var choropleth = L.geoJson(null, {
   style: choroplethStyle,
   onEachFeature: onEachFeature
+  // ENTER THE LAYER NAME HERE
 }).addTo(map);
 
 var pubPopup = "Loading...";
@@ -23,12 +32,15 @@ var popPopupOptions = {
 };
 
 var pubMarkers = L.geoJSON(null, {
+  // ENTER THE POINT LAYER NAME HERE
   pointToLayer: function(feature, latlng) {
     return L.circleMarker(latlng, geojsonMarkerOptions);
   }
 })
   .bindPopup(pubPopup, popPopupOptions)
   .addTo(map);
+
+//  =====================================================
 
 function pubMarkerClickEvent(e) {
   var popup = e.target.getPopup();
