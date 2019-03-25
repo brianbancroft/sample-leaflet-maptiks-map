@@ -3,6 +3,8 @@ L.tileLayer(
   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYnJpYW5iYW5jcm9mdCIsImEiOiJsVGVnMXFzIn0.7ldhVh3Ppsgv4lCYs65UdA",
   {
     // ENTER THE MAP NAME HERE
+    maptiks_id: "GoGeomatics Tracking Map",
+
     maxZoom: 18,
     attribution:
       'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
@@ -21,8 +23,9 @@ L.tileLayer(
 
 var choropleth = L.geoJson(null, {
   style: choroplethStyle,
-  onEachFeature: onEachFeature
+  onEachFeature: onEachFeature,
   // ENTER THE LAYER NAME HERE
+  maptiks_id: "Polygon -> Income Layer"
 }).addTo(map);
 
 var pubPopup = "Loading...";
@@ -33,6 +36,7 @@ var popPopupOptions = {
 
 var pubMarkers = L.geoJSON(null, {
   // ENTER THE POINT LAYER NAME HERE
+  maptiks_id: "Point -> Pub Markers",
   pointToLayer: function(feature, latlng) {
     return L.circleMarker(latlng, geojsonMarkerOptions);
   }
