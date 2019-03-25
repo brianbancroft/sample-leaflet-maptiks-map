@@ -1,4 +1,4 @@
-var map = L.map("map").setView([48.3062302, -123.3942418], 10);
+var map = L.map("map").setView([48.4062302, -123.3942418], 12);
 L.tileLayer(
   "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYnJpYW5iYW5jcm9mdCIsImEiOiJsVGVnMXFzIn0.7ldhVh3Ppsgv4lCYs65UdA",
   {
@@ -11,10 +11,43 @@ L.tileLayer(
   }
 ).addTo(map);
 
+var choropleth = L.geoJson(null, {
+  style: choroplethStyle,
+  onEachFeature: onEachFeature
+}).addTo(map);
+
+var pubPopup = "Loading...";
+var popPopupOptions = {
+  maxWidth: "500",
+  className: "custom"
+};
+
+var pubMarkers = L.geoJSON(null, {
+  pointToLayer: function(feature, latlng) {
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+  }
+})
+  .bindPopup(pubPopup, popPopupOptions)
+  .addTo(map);
+
+function pubMarkerClickEvent(e) {
+  var popup = e.target.getPopup();
+
+  popup.setContent(`
+    <h3>${e.sourceTarget.feature.properties.name}</h3>
+    <a href="${
+      e.sourceTarget.feature.properties.url
+    }" target="_blank">Website</a>
+  `);
+  popup.update();
+}
+
+pubMarkers.on("click", pubMarkerClickEvent);
+
 // control that shows state info on hover
 var info = L.control();
 
-info.onAdd = function(map) {
+info.onAdd = function() {
   this._div = L.DomUtil.create("div", "info");
   this.update();
   return this._div;
@@ -67,15 +100,15 @@ function highlightFeature(e) {
     dashArray: "",
     fillOpacity: 0.7
   });
+  choropleth.bringToBack();
 
   if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
     layer.bringToFront();
+    pubMarkers.bringToFront();
   }
 
   info.update(layer.feature.properties);
 }
-
-var choropleth;
 
 function resetHighlight(e) {
   choropleth.resetStyle(e.target);
@@ -93,11 +126,6 @@ function onEachFeature(feature, layer) {
     click: zoomToFeature
   });
 }
-
-choropleth = L.geoJson(null, {
-  style: choroplethStyle,
-  onEachFeature: onEachFeature
-}).addTo(map);
 
 map.attributionControl.addAttribution(
   'Population data &copy; <a href="https://www.statcan.gc.ca/eng/start">Statistics Canada</a>'
@@ -131,14 +159,31 @@ legend.onAdd = function(map) {
 
 legend.addTo(map);
 
+const stats =
+  "https://s3.amazonaws.com/cdn.brianbancroft.io/assets/sample-map-data/income-with-children.geojson";
 axios
-  .get(
-    "https://s3.amazonaws.com/cdn.brianbancroft.io/assets/sample-map-data/income-with-children.geojson"
-  )
+  .get(stats)
   .then(response => {
     choropleth.addData(response.data);
+    choropleth.bringToBack();
   })
   .catch(console.error);
 
+var geojsonMarkerOptions = {
+  radius: 8,
+  fillColor: "#ff7800",
+  color: "#000",
+  weight: 1,
+  opacity: 1,
+  fillOpacity: 0.8
+};
+
 const pubs =
   "https://gist.githubusercontent.com/brianbancroft/2e6abac2ce26a9ff188ac4c8d17bb3ff/raw/10404a93a040ba2cb0224ef4c86fed8743d3a22f/map.geojson";
+axios
+  .get(pubs)
+  .then(response => {
+    pubMarkers.addData(response.data);
+    pubMarkers.bringToFront();
+  })
+  .catch(console.error);
